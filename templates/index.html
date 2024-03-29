@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de São Paulo</title>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #fefefe;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #59575a;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        #weather-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        #map {
+            width: 80%;
+            height: 400px;
+            margin-bottom: 20px;
+            border-radius: 20px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px 0;
+            
+        }
+        
+        
+        
+    </style>
+</head>
+<body>
+    <div id="weather-info">
+        <h2>Informações Meteorológicas</h2>
+        <p>Temperatura: <span id="temperature"></span>°C</p>
+        <p>Precipitação: <span id="precipitation"></span>mm</p>
+        <p>Velocidade do Vento: <span id="wind-speed"></span>m/s</p>
+        <p>Bairro: <span id="neighborhood"></span></p>
+    </div>
+
+    <div id="map"></div>
+
+    <footer>
+        <p>Desenvolvido por - Kaique Miranda - 2024</p>
+    </footer>
+
+    <script>
+        var map = L.map('map').setView([-23.5505, -46.6333], 10);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        map.on('click', function(e) {
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+            .then(response => response.json())
+            .then(data => {
+                var address = data.address;
+                var neighborhood = address.neighbourhood || address.suburb || address.city_district || 'Desconhecido';
+                document.getElementById('neighborhood').innerText = neighborhood;
+            })
+            .catch(error => console.error('Erro:', error));
+
+            fetch('/weather', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ lat: e.latlng.lat, lng: e.latlng.lng })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('temperature').innerText = data.temperature;
+                document.getElementById('precipitation').innerText = data.precipitation;
+                document.getElementById('wind-speed').innerText = data.wind_speed;
+            })
+            .catch(error => console.error('Erro:', error));
+        });
+    </script>
+</body>
+</html>
