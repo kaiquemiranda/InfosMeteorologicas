@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa de São Paulo</title>
+    <!-- Importa a biblioteca Leaflet para exibição de mapas -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
@@ -29,7 +30,6 @@
         .social-icon {
             width: 40px;
             height: 40px;
-
         }
 
         #weather-info {
@@ -58,6 +58,7 @@
     </style>
 </head>
 <body>
+    <!-- Ícones de redes sociais -->
     <div id="social-icons">
         <a href="https://github.com/kaiquemiranda" target="_blank"><img src="/static/img/github.svg" alt="GitHub" class="social-icon"></a>
         <a href="https://www.instagram.com/kaiquerebelo/" target="_blank"><img src="/static/img/insta.svg" alt="Instagram" class="social-icon"></a>
@@ -65,6 +66,7 @@
         <a href="https://wa.me/5511930084031" target="_blank"><img src="/static/img/whats.svg" alt="WhatsApp" class="social-icon"></a>
     </div>
 
+    <!-- Informações meteorológicas -->
     <div id="weather-info">
         <h2>DINAMIC WEATHER</h2>
         <div>
@@ -75,12 +77,15 @@
         </div>
     </div>
 
+    <!-- Mapa -->
     <div id="map"></div>
 
+    <!-- Rodapé -->
     <footer>
         <p>Desenvolvido por - Kaique Miranda - 2024</p>
     </footer>
 
+    <!-- Script JavaScript para exibir o mapa e obter informações -->
     <script>
         var map = L.map('map').setView([-23.5505, -46.6333], 10);
 
@@ -89,6 +94,7 @@
         }).addTo(map);
 
         map.on('click', function(e) {
+            // Obtém as informações do bairro ao clicar no mapa
             fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
             .then(response => response.json())
             .then(data => {
@@ -98,6 +104,7 @@
             })
             .catch(error => console.error('Erro:', error));
 
+            // Obtém as informações meteorológicas da região clicada
             fetch('/weather', {
                 method: 'POST',
                 headers: {
