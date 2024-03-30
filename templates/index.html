@@ -12,45 +12,67 @@
             color: #fefefe;
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #59575a;
+            position: relative;
+            background-image: url('/static/img/bg.jpg');
             background-size: cover;
             background-position: center;
         }
-        
+
+        #social-icons {
+            position: absolute;
+            top: 20px;
+            right: 60px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+
+        }
+
         #weather-info {
             text-align: center;
-            margin-bottom: 20px;
+            margin-top: 20px;
+            margin-left: 40px;
+            margin-right: 40px;
+            font-size: 18px;
+            background-color: rgba(255,255,255, 0.2);
+            padding: 10px;
+            border-radius: 10px;
         }
-        
+
         #map {
             width: 80%;
-            height: 400px;
-            margin-bottom: 20px;
+            height: 500px;
+            margin: 20px auto;
             border-radius: 20px;
         }
-        
+
         footer {
             text-align: center;
             margin-top: 20px;
             padding: 10px 0;
-            
         }
-        
-        
-        
     </style>
 </head>
 <body>
+    <div id="social-icons">
+        <a href="https://github.com/kaiquemiranda" target="_blank"><img src="/static/img/github.svg" alt="GitHub" class="social-icon"></a>
+        <a href="https://www.instagram.com/kaiquerebelo/" target="_blank"><img src="/static/img/insta.svg" alt="Instagram" class="social-icon"></a>
+        <a href="https://www.linkedin.com/in/kaique-miranda/" target="_blank"><img src="/static/img/linkedin.svg" alt="LinkedIn" class="social-icon"></a>
+        <a href="https://wa.me/5511930084031" target="_blank"><img src="/static/img/whats.svg" alt="WhatsApp" class="social-icon"></a>
+    </div>
+
     <div id="weather-info">
-        <h2>Informações Meteorológicas</h2>
-        <p>Temperatura: <span id="temperature"></span>°C</p>
-        <p>Precipitação: <span id="precipitation"></span>mm</p>
-        <p>Velocidade do Vento: <span id="wind-speed"></span>m/s</p>
-        <p>Bairro: <span id="neighborhood"></span></p>
+        <h2>DINAMIC WEATHER</h2>
+        <div>
+            <p>Temperatura: <span id="temperature"></span>°C</p>
+            <p>Precipitação: <span id="precipitation"></span>mm</p>
+            <p>Velocidade do Vento: <span id="wind-speed"></span>m/s</p>
+            <p>Bairro: <span id="neighborhood"></span></p>
+        </div>
     </div>
 
     <div id="map"></div>
