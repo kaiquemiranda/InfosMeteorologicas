@@ -1,3 +1,8 @@
+<!--
+    Nessa versão conseguimos adicionar um icone no mapa de acordo com a velocidade do vento
+-->
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,8 +12,6 @@
     <!-- Importa a biblioteca Leaflet para exibição de mapas -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-
-    <!-- Estilos CSS -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,68 +24,33 @@
             background-position: center;
         }
 
-
-        .navbar {
-            background-color: rgba(255, 255, 255, 0.8); /* Cor cinza com transparência */
-            padding: 10px; /* Adicione padding para espaço interno */
-        }
-        
-        .navbar ul {
-            list-style-type: none; /* Remove marcadores de lista */
-            margin: 0;
-            padding-left: 40px;
-            padding-bottom: 5px;
-            height: 40px;
-            font-size: 35px;
-        }
-        
-        .navbar ul li {
-            display: inline; /* Coloca os itens da lista na mesma linha */
-            margin-right: 20px; /* Espaçamento entre os itens */
-        }
-        
-        .navbar ul li a {
-            text-decoration: none; /* Remove sublinhado dos links */
-            color: black; /* Cor do texto */
-        }
-        
-        .navbar ul li a:hover {
-            border-bottom: 3px solid black; /* Cor do texto ao passar o mouse */
-             
-        }
-        
         #social-icons {
             position: absolute;
-            top: 15px;
+            top: 20px;
             right: 60px;
             display: flex;
             gap: 10px;
         }
 
         .social-icon {
-            width: 50px;
+            width: 40px;
             height: 40px;
         }
 
         #weather-info {
             text-align: center;
-            margin-top: 60px;
-            margin-left: 300px;
-            margin-right: 300px;
-            font-size: 28px;
-            background-color: rgba(0,0,0, 0.3);
+            margin-top: 20px;
+            margin-left: 40px;
+            margin-right: 40px;
+            font-size: 18px;
+            background-color: rgba(255,255,255, 0.2);
             padding: 10px;
             border-radius: 10px;
         }
 
-        #weather-info div {
-            display: flex;
-            justify-content: space-evenly;
-
-        }
         #map {
-            width: 70%;
-            height: 500px;
+            width: 80%;
+            height: 400px;
             margin: 20px auto;
             border-radius: 20px;
         }
@@ -93,28 +61,15 @@
             padding: 10px 0;
         }
     </style>
-
-
 </head>
 <body>
-
-    <!-- Barra de Navegação -->
-    <nav class="navbar">
-        <ul>
-            <li><a href="#home">HOME</a></li>
-            <li><a href="#about">ABOUT</a></li>
-        </ul>
-
-        <!-- Ícones de redes sociais -->
+    <!-- Ícones de redes sociais -->
     <div id="social-icons">
         <a href="https://github.com/kaiquemiranda" target="_blank"><img src="/static/img/github.svg" alt="GitHub" class="social-icon"></a>
         <a href="https://www.instagram.com/kaiquerebelo/" target="_blank"><img src="/static/img/insta.svg" alt="Instagram" class="social-icon"></a>
         <a href="https://www.linkedin.com/in/kaique-miranda/" target="_blank"><img src="/static/img/linkedin.svg" alt="LinkedIn" class="social-icon"></a>
         <a href="https://wa.me/5511930084031" target="_blank"><img src="/static/img/whats.svg" alt="WhatsApp" class="social-icon"></a>
     </div>
-    </nav>
-
-    
 
     <!-- Informações meteorológicas -->
     <div id="weather-info">
@@ -143,32 +98,63 @@
             maxZoom: 19,
         }).addTo(map);
 
-        map.on('click', function(e) {
-            // Obtém as informações do bairro ao clicar no mapa
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
-            .then(response => response.json())
-            .then(data => {
-                var address = data.address;
-                var neighborhood = address.neighbourhood || address.suburb || address.city_district || 'Desconhecido';
-                document.getElementById('neighborhood').innerText = neighborhood;
-            })
-            .catch(error => console.error('Erro:', error));
+        // Função para adicionar marcador de vento no mapa
+        function addWindMarker(latlng) {
+            var windIcon = L.icon({
+                iconUrl: '/static/img/wind.png',
+                iconSize: [30, 30],
+            });
 
-            // Obtém as informações meteorológicas da região clicada
+            L.marker(latlng, { icon: windIcon }).addTo(map);
+        }
+
+        // Função para verificar a velocidade do vento e adicionar marcador se necessário
+        function checkWeatherAndAddMarker(latlng) {
             fetch('/weather', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ lat: e.latlng.lat, lng: e.latlng.lng })
+                body: JSON.stringify({ lat: latlng.lat, lng: latlng.lng })
             })
             .then(response => response.json())
             .then(data => {
                 document.getElementById('temperature').innerText = data.temperature;
                 document.getElementById('precipitation').innerText = data.precipitation;
                 document.getElementById('wind-speed').innerText = data.wind_speed;
+
+                // Adiciona marcador de vento no mapa se a velocidade do vento for maior que 2.5 m/s
+                if (parseFloat(data.wind_speed) > 2.5) {
+                    addWindMarker(latlng);
+                }
             })
             .catch(error => console.error('Erro:', error));
+        }
+
+        // Verifica a velocidade do vento automaticamente ao carregar o mapa
+        map.on('click', function(e) {
+            var latlng = e.latlng;
+
+            // Obtém as informações do bairro ao clicar no mapa
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`)
+            .then(response => response.json())
+            .then(data => {
+                var address = data.address;
+                var neighborhood = address.neighbourhood || address.suburb || address.city_district || 'Desconhecido';
+                document.getElementById('neighborhood').innerText = neighborhood;
+
+                // Verifica a velocidade do vento e adiciona marcador se necessário
+                checkWeatherAndAddMarker(latlng);
+            })
+            .catch(error => console.error('Erro:', error));
+        });
+
+        // Verifica a velocidade do vento automaticamente ao carregar o mapa
+        map.on('load', function() {
+            var latlng = map.getCenter();
+
+            // Verifica a velocidade do vento e adiciona marcador se necessário
+            checkWeatherAndAddMarker(latlng);
         });
     </script>
 </body>
